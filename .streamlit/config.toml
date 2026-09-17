@@ -1,0 +1,9 @@
+[server]
+# Varsayılan 8501'i başka bir proje kullanıyor.
+port = 8502
+
+[browser]
+# Arşiv belgeleri işlendiği için dışarıya hiçbir şey gitmemeli.
+# Streamlit'in kullanım istatistikleri belge içeriği taşımaz ama
+# uygulamanın tamamen çevrimdışı olduğu iddiasını bozar.
+gatherUsageStats = false

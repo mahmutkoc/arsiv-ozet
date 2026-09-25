@@ -7,6 +7,8 @@
 from __future__ import annotations
 
 import shutil
+import os
+import threading
 import tempfile
 from pathlib import Path
 
@@ -17,6 +19,38 @@ from core.pipeline import extract, read_pages
 from core.summarize import Kunye, LocalModel, find_model, limit_sentences
 
 st.set_page_config(page_title="Arşiv Künye Çıkarıcı", page_icon="📜", layout="wide")
+
+SHARED = os.environ.get("ARSIV_SHARED") == "1"
+
+
+@st.cache_resource
+def shared_resources():
+    from core.demo import DemoQueue
+    return DemoQueue(), threading.Lock()
+
+
+def require_login():
+    from core.demo import PASSWORD_FILE
+    try:
+        password = PASSWORD_FILE.read_text().strip()
+    except OSError:
+        password = ""
+    if len(password) < 16:
+        st.error("Paylaşım giriş ayarları hazır değil.")
+        st.stop()
+    if not st.session_state.get("archive_authenticated"):
+        with st.form("archive_login", clear_on_submit=True):
+            entered = st.text_input("Arşiv şifresi", type="password")
+            login = st.form_submit_button("Giriş yap")
+        if login and shared_resources()[0].authenticate(entered, password):
+            st.session_state.archive_authenticated = True
+            st.rerun()
+        elif login:
+            st.error("Giriş yapılamadı. Şifreyi kontrol edin veya bir dakika bekleyin.")
+        st.stop()
+    if st.sidebar.button("Çıkış yap"):
+        st.session_state.clear()
+        st.rerun()
 
 
 @st.cache_resource(show_spinner=False)
@@ -82,7 +116,7 @@ def page_process() -> None:
         help="Katalogdan indirdiğin sayfaları sırayla seç. Tek bir PDF de olabilir.",
     )
 
-    folder_input = st.text_input(
+    folder_input = "" if SHARED else st.text_input(
         "…ya da bir klasör yolu ver",
         placeholder="/Users/mahmut/arsiv-ozet/data/ornek",
     )
@@ -96,10 +130,17 @@ def page_process() -> None:
     temp_dir: Path | None = None
 
     if uploaded:
+        if SHARED:
+            from core.demo import validate_files
+            try:
+                validate_files([(item.name, item.getvalue()) for item in uploaded])
+            except Exception:
+                st.error("En fazla 15 sayfa ve toplam 20 MB: tek PDF veya geçerli görüntüler yükleyin.")
+                return
         temp_dir = Path(tempfile.mkdtemp(prefix="arsiv-"))
         for index, item in enumerate(uploaded, start=1):
             # Yükleme sırası korunsun diye sıra numarasıyla yazıyoruz.
-            (temp_dir / f"{index:03d}_{item.name}").write_bytes(item.getbuffer())
+            (temp_dir / f"{index:03d}{Path(item.name).suffix.lower()}").write_bytes(item.getbuffer())
         pdfs = list(temp_dir.glob("*.pdf"))
         source = pdfs[0] if len(uploaded) == 1 and pdfs else temp_dir
     elif folder_input.strip():
@@ -116,6 +157,13 @@ def page_process() -> None:
     def report(message: str, fraction: float) -> None:
         progress.progress(fraction, text=message)
 
+    lock = shared_resources()[1] if SHARED else None
+    if lock is not None and not lock.acquire(blocking=False):
+        if temp_dir:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        progress.empty()
+        st.warning("Başka bir belge işleniyor; işlem bitince tekrar deneyin.")
+        return
     try:
         # Okuma önce yapılıyor: model 7 GB tuttuğu için OCR sırasında
         # bellekte olması görüntü okumayı başarısız kılabiliyor.
@@ -127,9 +175,12 @@ def page_process() -> None:
         result = extract(source, pages, model=model, on_progress=report)
     except Exception as error:  # noqa: BLE001 - kullanıcıya sebebi göstermek istiyoruz
         progress.empty()
-        st.error(f"İşlem başarısız: {error}")
+        st.error("Belge işlenemedi. Dosyayı kontrol edin veya uygulama sahibine bildirin."
+                 if SHARED else f"İşlem başarısız: {error}")
         return
     finally:
+        if lock is not None:
+            lock.release()
         if temp_dir:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -198,7 +249,12 @@ def page_archive() -> None:
 
 def main() -> None:
     st.title("📜 Arşiv Künye Çıkarıcı")
-    st.caption("Tamamen yerel çalışır — belgeler hiçbir yere gönderilmez.")
+    if SHARED:
+        require_login()
+        st.caption("Belgeler paylaşım tüneli üzerinden sunucu bilgisayara gönderilir ve orada işlenir. "
+                   "Yeni sonuçlar ortak arşive kaydedilir; giriş yapan herkes kayıtları görebilir.")
+    else:
+        st.caption("Tamamen yerel çalışır — belgeler hiçbir yere gönderilmez.")
 
     try:
         model_path = find_model()

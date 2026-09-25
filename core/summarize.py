@@ -680,7 +680,7 @@ def kunye_from_text(model: LocalModel, text: str, notes: list[str] | None = None
     return parsed
 
 
-def extract_kunye(model: LocalModel, page_texts: Sequence[str]) -> Kunye:
+def extract_kunye(model: LocalModel, page_texts: Sequence[str], *, cache_notes: bool = True) -> Kunye:
     """Sayfa metinlerinden katalog künyesini üretir."""
     filled = [(i, t) for i, t in enumerate(page_texts, start=1) if t.strip()]
     if not filled:
@@ -692,7 +692,7 @@ def extract_kunye(model: LocalModel, page_texts: Sequence[str]) -> Kunye:
         joined = "\n\n".join(f"--- Sayfa {i} ---\n{t}" for i, t in filled)
         return kunye_from_text(model, joined)
 
-    notes = build_notes(model, page_texts)
+    notes = build_notes(model, page_texts, cache=cache_notes)
 
     reducible = notes
     while len(" ".join(reducible).split()) > REDUCE_BATCH_WORD_LIMIT and len(reducible) > 1:

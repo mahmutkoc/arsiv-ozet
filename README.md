@@ -2,7 +2,22 @@
 
 Devlet Arşivleri katalogundan indirilen çok sayfalı Latin harfli Türkçe
 belgeleri okuyup **katalog künyesi** üretir. **Tamamen yerelde çalışır** —
-internet bağlantısı ve API anahtarı gerekmez, belgeler hiçbir yere gönderilmez.
+Kurulum tamamlandıktan sonra yerel kullanımda internet bağlantısı ve API
+anahtarı gerekmez. İnternetten paylaşım açılırsa belgeler paylaşım tüneli
+üzerinden sunucu bilgisayara iletilir; model yine bu bilgisayarda çalışır.
+
+## Şifreli paylaşım
+
+`.venv/bin/python demo_start.py --archive` komutu ana uygulamayı 8503
+portunda şifreli olarak başlatır. İlk başlatmada oluşturulan şifre
+`.demo/password.txt` dosyasındadır; Git'e yüklenmez. Giriş yapan kişiler
+mevcut kayıtları görür ve yeni belgeleri ortak arşive kaydedebilir.
+Yerel klasör yolu bu modda kapalıdır. Harici erişim için ayrıca güvenli
+bir tünel gerekir. Bu geçici paylaşım modu kurumsal rol yönetimi sağlamaz.
+
+`--archive` olmadan başlatılan demo mevcut arşivi göstermez ve sonuçları
+yalnızca oturumda tutar. Her iki modda da model çıktıları insan kontrolü
+gerektirir. Belge, veritabanı, model ve şifre dosyaları bu depoya dahil değildir.
 
 Bu depo yalnızca kaynak kodu içerir. Arşiv belgeleri, veritabanı, çıkarılan
 metinler ve model dosyaları paylaşılmaz. Kurulum sırasında bağımlılıkları

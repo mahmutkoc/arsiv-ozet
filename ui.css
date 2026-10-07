@@ -1,0 +1,21 @@
+:root { color-scheme: light; }
+.stApp { background: #f3f4f6; color: #292a32; }
+[data-testid="stMainBlockContainer"] { max-width: 1440px; padding-top: 2.5rem; }
+[data-testid="stHeader"] { background: #f3f4f6; }
+[data-testid="stSidebar"] { background: #fff; border-right: 1px solid #e1e3e9; border-top: 5px solid #ac202d; }
+[data-testid="stSidebar"] h2 { font-size: 1.3rem; letter-spacing: -.4px; }
+[data-testid="stSidebar"] [data-testid="stImage"] { margin: 0 auto 1rem; }
+[data-testid="stSidebar"] [role="radiogroup"] { gap: .5rem; }
+[data-testid="stSidebar"] [role="radiogroup"] label { padding: .7rem 1rem; border-radius: 7px; background: #f7f7f9; width: 100%; }
+[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) { background: #ac202d; color: white; }
+h1, h2, h3 { color: #292a32; letter-spacing: -.5px; }
+h2 { font-size: 1.7rem; }
+[data-testid="stVerticalBlockBorderWrapper"] { background: #fff; border-color: #e1e3e9; border-radius: 12px; }
+[data-testid="stFileUploaderDropzone"] { background: #fcf3f5; border: 1px dashed #d4a2a8; border-radius: 9px; padding: 1.5rem 1rem; }
+.stButton button[kind="primary"], .stFormSubmitButton button[kind="primary"] { background: #ac202d; border-color: #ac202d; color: white; }
+.stButton button[kind="primary"]:hover { background: #8c1924; border-color: #8c1924; }
+[data-testid="stCode"] { border: 1px solid #e8e2e5; border-radius: 8px; }
+[data-testid="stCode"] pre { background: #faf7f8; }
+[data-testid="stCaptionContainer"] { color: #666a76; }
+[data-testid="stExpander"] { background: white; border-radius: 9px; }
+@media(max-width: 800px) { [data-testid="stMainBlockContainer"] { padding: 1.5rem 1rem; } }

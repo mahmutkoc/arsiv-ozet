@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Arşiv Künye · Tasarım örnekleri</title>
+<style>
+:root{--red:#bd2029;--ink:#292a2e;--muted:#77777c;--line:#e4e4e7}*{box-sizing:border-box}body{margin:0;background:#f3f3f5;color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}button,input{font:inherit}button{cursor:pointer} .chooser{background:#24252a;color:white;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}.chooser small{color:#bcbcc4}.switch{display:flex;gap:8px;flex-wrap:wrap}.switch button{border:1px solid #62636a;background:transparent;color:white;border-radius:7px;padding:9px 16px}.switch button[aria-selected=true]{background:white;color:#292a2e;border-color:white}.frame{max-width:1440px;margin:30px auto;background:white;min-height:850px;border:1px solid var(--line);box-shadow:0 12px 50px #25252a08}.brand{display:flex;align-items:center;gap:18px}.brand img{width:76px;height:76px;object-fit:contain}.brand strong{display:block;font-size:19px;letter-spacing:-.4px}.brand small{color:var(--muted);font-size:11px;letter-spacing:1.4px}.top{padding:25px 42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.badge{font-size:12px;color:#666;background:#f4f4f5;border:1px solid var(--line);padding:6px 12px;border-radius:30px}.nav{display:flex;gap:32px;padding:0 42px;border-bottom:1px solid var(--line)}.nav span{padding:17px 0;color:var(--muted)}.nav .active{color:var(--red);border-bottom:3px solid var(--red);font-weight:600}.workspace{padding:32px 42px}.eyebrow{color:var(--red);font-size:11px;font-weight:700;letter-spacing:2px;margin:0 0 6px}h1{font-size:30px;line-height:1.3;letter-spacing:-1px;margin:0 0 9px}h2{font-size:17px;margin:0 0 17px}p{margin:0 0 20px}.muted{color:var(--muted)}.columns{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;margin-top:28px}.card{border:1px solid var(--line);border-radius:9px;padding:26px;background:white}.number{display:inline-flex;background:#f9e9eb;color:var(--red);height:27px;width:27px;align-items:center;justify-content:center;border-radius:6px;font-size:12px;margin-right:8px}.upload{border:1px dashed #c6c6cb;background:#fafafb;padding:32px 16px;text-align:center;border-radius:7px;margin-bottom:24px}.upload svg{width:30px;height:30px;color:var(--red);display:block;margin:0 auto 12px}.upload strong{display:block}.upload small{display:block;color:var(--muted);margin:7px 0 15px}.secondary{background:white;border:1px solid #d3d3d7;padding:8px 18px;border-radius:6px;color:var(--ink)}label{display:block;font-size:13px;font-weight:600;margin:17px 0 7px}input{border:1px solid #d9d9de;border-radius:6px;width:100%;padding:11px 13px;color:#555;background:white}.primary{background:var(--red);color:white;border:0;padding:12px 23px;border-radius:6px;font-weight:600;margin-top:23px}.hint{font-size:12px;color:var(--muted);margin-top:12px}.result-head{display:flex;align-items:center;justify-content:space-between}.result-head small{font-size:11px;color:var(--muted)}.field{border-top:1px solid #ededf0;padding:15px 0}.field strong{font-size:12px;color:#707078;display:block;margin-bottom:6px}.field p{font-size:14px;margin:0}.tags{display:flex;gap:6px;flex-wrap:wrap}.tags span{background:#f3f3f5;border-radius:4px;padding:3px 9px;font-size:12px}.footer{color:#929298;font-size:11px;padding:22px 42px;border-top:1px solid var(--line);display:flex;justify-content:space-between}.sidebar{display:none}.design-note{max-width:1440px;margin:0 auto 30px;padding:0 16px;color:#696970}.layout2{display:grid;grid-template-columns:240px 1fr;background:#f6f6f8}.layout2 .sidebar{display:flex;flex-direction:column;padding:32px 22px;background:#fff;border-right:1px solid var(--line);grid-row:1 / 5}.sidebar img{width:95px;align-self:center;margin-bottom:18px}.sidebar .name{text-align:center;font-weight:650;line-height:1.5}.sidebar small{text-align:center;color:#888;margin:12px 0 38px}.sidebar a{display:block;padding:12px;border-radius:6px;margin:3px 0;color:#777}.sidebar a.selected{background:#faedef;color:var(--red);font-weight:600}.sidebar .bottom{margin-top:auto;font-size:11px;color:#999}.layout2 .top{background:#fff;padding:20px 30px}.layout2 .brand img,.layout2 .brand small,.layout2 .nav{display:none}.layout2 .brand strong{font-size:16px}.layout2 .workspace{padding:30px}.layout2 .columns{grid-template-columns:1fr}.layout2 .card{padding:24px}.layout2 .upload{padding:22px}.layout2 .result{display:none}.layout2 .footer{background:#fff}.layout3{background:#f8f7f4;border-top:4px solid var(--red)}.layout3 .top{background:white}.layout3 .nav{background:white}.layout3 .workspace{max-width:1200px;margin:auto}.layout3 .columns{grid-template-columns: .85fr 1.3fr}.layout3 .result{border-radius:0;border-top:3px solid #aaa;background:#fffefa;box-shadow:0 5px 20px #554c3510}.layout3 h1{font-family:Georgia,serif;font-size:34px}.layout3 .card:not(.result){border:0;background:transparent;padding-left:0}.layout3 .footer{background:white}.layout3 .upload{background:white}.layout3 .field{padding:19px 0}.layout3 .primary{width:100%}@media(max-width:800px){.frame{margin:15px}.top,.workspace{padding:22px}.columns,.layout3 .columns{grid-template-columns:1fr}.layout2{grid-template-columns:1fr}.layout2 .sidebar{display:none}.brand small{letter-spacing:0}.brand strong{font-size:16px}.brand img{width:60px;height:60px}.badge{display:none}.nav{padding:0 22px;gap:20px}.footer{padding:20px;gap:15px}.chooser{padding:18px}.layout3 .card:not(.result){padding:0}}
+.layout1{background:#f0f1f3}
+.layout1 .top{background:#a71923;border-bottom:4px solid #d6343e;color:white}
+.layout1 .brand img{background:white;border-radius:50%;padding:4px}
+.layout1 .brand small{color:#ffe1e3}
+.layout1 .badge{background:#ffffff12;border-color:#ffffff55;color:white}
+.layout1 .nav{background:white;gap:12px;padding-top:10px}
+.layout1 .nav span{padding:12px 20px}
+.layout1 .nav .active{background:#fbe9eb;border-radius:7px 7px 0 0;color:#a71923}
+.layout1 .upload{background:#fff3f4;border-color:#ce7780}
+.layout1 .upload strong{color:#8f1821}
+.layout1 .secondary{border-color:#ce7780;color:#a71923}
+.layout1 .secondary:hover{background:#fbe9eb}
+.layout1 .result{border-top:4px solid var(--red)}
+.layout1 .tags span{background:#fbe9eb;color:#92202a}
+.layout1 .primary:hover{background:#991a22}
+.layout1 input:focus{outline:2px solid #bd2029;outline-offset:2px}
+.layout1 .muted,.layout1 .hint,.layout1 .upload small{color:#62626b}
+.layout1 .footer{background:#e8e9ec;color:#60606a}
+/* İkinci alternatif: sakin, kurumsal çalışma alanı. */
+.layout2{grid-template-columns:244px minmax(0,1fr);grid-template-rows:auto 1fr auto;background:#f3f4f6;border-radius:14px;overflow:hidden;min-height:850px}
+.layout2 .sidebar{grid-row:1 / 4;padding:36px 20px 24px;background:#fff;border-top:5px solid #b51f2b}
+.layout2 .sidebar img{width:100px;margin-bottom:22px}
+.layout2 .sidebar .name{font-size:20px;letter-spacing:-.5px;color:#292a32}
+.layout2 .sidebar small{font-size:12px;color:#737580;margin:10px 0 40px}
+.layout2 .sidebar a{font-size:13px;padding:13px 15px;margin:4px 0;border:1px solid transparent}
+.layout2 .sidebar a.selected{background:#a91e2a;color:#fff;box-shadow:0 5px 12px #a91e2a18;border-color:#a91e2a}
+.layout2 .sidebar .bottom{border-top:1px solid #ececf0;padding-top:20px;line-height:1.9;color:#70727c}
+.layout2 .top{padding:22px 34px;min-height:84px;background:#fff}
+.layout2 .brand strong{font-size:15px;font-weight:600;color:#4a4b56}
+.layout2 .badge{background:#fff1f2;color:#9e2430;border-color:#efd7da;font-size:11px}
+.layout2 .workspace{padding:36px 34px 40px;min-width:0;width:100%}
+.layout2 .eyebrow{font-size:10px;letter-spacing:2px;margin-bottom:10px}
+.layout2 h1{font-size:28px;font-weight:650;letter-spacing:-.9px}
+.layout2 .muted{color:#676b77;font-size:14px}
+.layout2 .columns{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;margin-top:30px;align-items:start}
+.layout2 .card{padding:26px;border-color:#e1e3e9;border-radius:12px;box-shadow:0 3px 12px #20263604}
+.layout2 h2{font-size:16px;letter-spacing:-.3px;margin-bottom:22px}
+.layout2 .number{border-radius:50%;background:#f8e9ec;color:#a91e2a;width:28px;height:28px;margin-right:9px}
+.layout2 .upload{background:#fcf7f8;border:1px dashed #d4a2a8;padding:30px 12px;border-radius:9px}
+.layout2 .upload svg{width:42px;height:42px;padding:8px;background:#f5e5e8;border-radius:10px;margin-bottom:16px}
+.layout2 .upload strong{font-size:14px;color:#41424d}
+.layout2 .upload small{font-size:11px;color:#6f707c}
+.layout2 .secondary{font-size:12px;border-color:#d7bec2;color:#92202c;padding:8px 19px}
+.layout2 input{font-size:12px;padding:12px;border-color:#dfe1e7}
+.layout2 .primary{width:100%;background:#ac202d;padding:13px 16px;font-size:13px;box-shadow:0 3px 8px #a91e2a16}
+.layout2 .primary:hover{background:#8c1924}
+.layout2 .secondary:hover{background:#fae9ec}
+.layout2 input:focus-visible,.layout2 button:focus-visible{outline:2px solid #a91e2a;outline-offset:3px}
+.layout2 .hint{font-size:11px;color:#6e707c;line-height:1.8}
+.layout2 .result{display:block;border-top:3px solid #ac202d}
+.layout2 .result-head{align-items:flex-start;gap:10px}
+.layout2 .result-head small{white-space:nowrap;font-size:10px;padding-top:6px;color:#7a6470}
+.layout2 .field{padding:17px 0;border-color:#eeeef2}
+.layout2 .field:last-child{padding-bottom:0}
+.layout2 .field strong{font-size:10px;letter-spacing:1px;color:#727480;margin-bottom:8px}
+.layout2 .field p{font-size:13px;line-height:1.85;color:#41434f}
+.layout2 .tags span{background:#f5f0f1;color:#8e3541;padding:4px 10px;font-size:11px;border:1px solid #eddee1;border-radius:5px}
+.layout2 .footer{padding:18px 34px;color:#70727e;background:#f9f9fb;font-size:10px;gap:12px}
+@media(max-width:1100px){.layout2 .columns{grid-template-columns:1fr}.layout2 .workspace{padding:28px}.layout2 .result-head small{font-size:11px}}
+@media(max-width:800px){.layout2{grid-template-columns:minmax(0,1fr)}.layout2 .top{padding:20px}.layout2 .workspace{padding:26px 20px}.layout2 h1{font-size:25px}.layout2 .card{padding:20px}.layout2 .footer{padding:18px 20px;flex-wrap:wrap}}
+</style>
+<div class="chooser"><div><strong>Arşiv Künye Çıkarıcı</strong><br><small>Arayüz tasarım çalışması · 3 alternatif</small></div><div class="switch" role="tablist" aria-label="Tasarım seçimi"><button role="tab" aria-selected="true" data-design="1">01 · Kurumsal</button><button role="tab" aria-selected="false" data-design="2">02 · Çalışma alanı</button><button role="tab" aria-selected="false" data-design="3">03 · Belge odaklı</button></div></div>
+<div class="frame layout2" id="frame">
+<aside class="sidebar"><img src="kurum-logo.png" alt="Devlet Arşivleri Başkanlığı logosu"><div class="name">Arşiv Künye<br>Çıkarıcı</div><small>Belgeden katalog bilgisine</small><a class="selected">＋ Yeni belge işle</a><a>▤ Kayıtlı belgeler</a><div class="bottom">Arayüz tasarım önerisi<br>Mahmut Koç</div></aside>
+<header class="top"><div class="brand"><img src="kurum-logo.png" alt="Devlet Arşivleri Başkanlığı logosu"><div><small>DEVLET ARŞİVLERİ BAŞKANLIĞI</small><strong>Arşiv Künye Çıkarıcı</strong></div></div><span class="badge">Tasarım önizlemesi</span></header>
+<nav class="nav"><span class="active">Belge işle</span><span>Kayıtlı belgeler</span></nav>
+<main class="workspace"><p class="eyebrow">BELGE İŞLEME</p><h1>Belgelerden katalog künyesine.</h1><p class="muted">Gömlekteki sayfaları yükleyin, künye taslağını hazırlayın ve kontrol edin.</p>
+<div class="columns"><section class="card"><h2><span class="number">01</span> Belgeleri yükleyin</h2><div class="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></svg><strong>Sayfaları buraya sürükleyin</strong><small>PDF veya görüntü · En fazla 15 sayfa, toplam 20 MB</small><button class="secondary" type="button" onclick="document.getElementById('sample').textContent='Bu bir tasarım örneğidir; dosya yüklenmez.'">Dosya seç</button><div id="sample" class="hint" aria-live="polite"></div></div><label for="name">Belge / gömlek adı</label><input id="name" placeholder="Örn. Okul binasının onarımına ilişkin yazışmalar"><button class="primary" type="button" onclick="document.getElementById('sample').textContent='Künye üretimi mevcut uygulamada çalışır. Bu sayfa yalnızca tasarım önizlemesidir.'">Oku ve künye çıkar →</button><div class="hint">Üretilen bilgileri kaynak belgelerle karşılaştırarak kontrol edin.</div></section>
+<section class="card result"><div class="result-head"><h2><span class="number">02</span> Katalog künyesi</h2><small>Kurgusal örnek</small></div><div class="field"><strong>BELGE ÖZETİ</strong><p>Okul binasının onarımı için ihtiyaçların belirlenmesi ve ödenek talebinin ilgili makama iletilmesine ilişkin yazışmalar.</p></div><div class="field"><strong>MADDE VE YER ADLARI</strong><div class="tags"><span>Okul onarımı</span><span>Ankara</span></div></div><div class="field"><strong>ŞAHIS ADLARI</strong><p class="muted">Belirtilmemiş</p></div><div class="field"><strong>TÜZEL KURULUŞ ADLARI</strong><p>Maarif Vekâleti</p></div><div class="field"><strong>AÇIKLAMA</strong><p class="muted">—</p></div></section></div></main>
+<footer class="footer"><span>Arayüz tasarım önerisi · Resmî kurum hizmeti değildir.</span><span>Belge işleme ve kataloglama</span></footer></div>
+<p class="design-note" id="description">01 · Kurumsal — Koyu kırmızı başlık, açık gri zemin ve kırmızı detaylar. Belge yükleme ve künye sonucu yan yana.</p>
+<script>
+const notes=[document.getElementById('description').textContent,'02 · Çalışma alanı — Kurum logolu sol menü, bordo vurgular, açık gri çalışma zemini ve yan yana belge / künye kartları.','03 · Belge odaklı — Kırık beyaz zemin, kâğıt görünümünde künye ve daha belirgin tipografi.'];
+function selectDesign(value){
+  document.getElementById('frame').className='frame layout'+value;
+  document.querySelectorAll('[data-design]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.design===value)));
+  document.getElementById('description').textContent=notes[Number(value)-1];
+}
+document.querySelectorAll('[data-design]').forEach(b=>b.addEventListener('click',()=>selectDesign(b.dataset.design)));
+selectDesign('2');
+</script></html>

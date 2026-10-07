@@ -17,7 +17,7 @@ archive = "--archive" in sys.argv[1:]
 if archive:
     os.environ["ARSIV_SHARED"] = "1"
 args = [sys.executable, "-m", "streamlit", "run", "app.py" if archive else "demo_app.py",
-    "--server.address", "127.0.0.1", "--server.port", "8503",
+    "--server.address", "127.0.0.1", "--server.port", os.environ.get("ARSIV_PORT", "8503"),
     "--server.headless", "true", "--server.maxUploadSize", "20",
     "--server.enableStaticServing", "false", "--server.enableXsrfProtection", "true",
     "--server.fileWatcherType", "none", "--client.showErrorDetails", "false",

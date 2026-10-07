@@ -15,6 +15,7 @@ from pathlib import Path
 import streamlit as st
 
 from core import store
+from core.ui import setup_interface, sidebar_footer
 from core.pipeline import extract, read_pages
 from core.summarize import Kunye, LocalModel, find_model, limit_sentences
 
@@ -107,23 +108,33 @@ def render_pages(pages: list[tuple[int, str]]) -> None:
 
 
 def page_process() -> None:
-    st.header("Belge işle")
+    st.header("Belgelerden katalog künyesine.")
+    st.caption("Gömlekteki sayfaları yükleyin, künye taslağını hazırlayın ve kontrol edin.")
+    input_column, result_column = st.columns([1, 1], gap="large")
+    input_card = input_column.container(border=True)
+    result_card = result_column.container(border=True)
+    with result_card:
+        preview = st.empty()
+        preview.info("Katalog künyesi burada görünecek. Başlamak için belgelerinizi yükleyin.")
+    with input_card:
+        st.subheader("01 · Belgeleri yükleyin")
 
-    uploaded = st.file_uploader(
+    uploaded = input_card.file_uploader(
         "Sayfa görüntülerini ya da PDF'i yükle",
         type=["jpg", "jpeg", "png", "tif", "tiff", "pdf"],
         accept_multiple_files=True,
         help="Katalogdan indirdiğin sayfaları sırayla seç. Tek bir PDF de olabilir.",
     )
 
-    folder_input = "" if SHARED else st.text_input(
+    folder_input = "" if SHARED else input_card.text_input(
         "…ya da bir klasör yolu ver",
         placeholder="/Users/mahmut/arsiv-ozet/data/ornek",
     )
 
-    name = st.text_input("Belge adı", placeholder="Orman Çiftliği'nin hazineye devri")
+    name = input_card.text_input("Belge adı", placeholder="Orman Çiftliği'nin hazineye devri")
+    input_card.caption("Üretilen bilgileri kaynak belgelerle karşılaştırarak kontrol edin.")
 
-    if not st.button("Oku ve künye çıkar", type="primary"):
+    if not input_card.button("Oku ve künye çıkar", type="primary", use_container_width=True):
         return
 
     source: Path | None = None
@@ -201,7 +212,9 @@ def page_process() -> None:
         )
 
     st.success(f"{result.page_count} sayfa, {result.word_count} kelime okundu.")
-    render_kunye(result.kunye)
+    preview.empty()
+    with result_card:
+        render_kunye(result.kunye)
     if result.kunye.notes:
         with st.expander("Sayfa sayfa döküm"):
             for note in result.kunye.notes:
@@ -248,7 +261,7 @@ def page_archive() -> None:
 
 
 def main() -> None:
-    st.title("📜 Arşiv Künye Çıkarıcı")
+    setup_interface()
     if SHARED:
         require_login()
         st.caption("Belgeler paylaşım tüneli üzerinden sunucu bilgisayara gönderilir ve orada işlenir. "
@@ -256,16 +269,17 @@ def main() -> None:
     else:
         st.caption("Tamamen yerel çalışır — belgeler hiçbir yere gönderilmez.")
 
+    page = st.sidebar.radio("Çalışma alanı", ["Belge işle", "Kayıtlı belgeler"])
+    sidebar_footer()
     try:
         model_path = find_model()
         st.sidebar.success(f"Model: {model_path.name}")
     except RuntimeError as error:
         st.sidebar.error(str(error))
 
-    tab_process, tab_archive = st.tabs(["Belge işle", "Kayıtlı belgeler"])
-    with tab_process:
+    if page == "Belge işle":
         page_process()
-    with tab_archive:
+    else:
         page_archive()
 
 

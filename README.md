@@ -1,29 +1,32 @@
 # Arşiv Künye Çıkarıcı
 
 Devlet Arşivleri katalogundan indirilen çok sayfalı Latin harfli Türkçe
-belgeleri okuyup **katalog künyesi** üretir. **Tamamen yerelde çalışır** —
-Kurulum tamamlandıktan sonra yerel kullanımda internet bağlantısı ve API
-anahtarı gerekmez. İnternetten paylaşım açılırsa belgeler paylaşım tüneli
-üzerinden sunucu bilgisayara iletilir; model yine bu bilgisayarda çalışır.
+belgeleri okuyup **katalog künyesi** üretir. OCR ve model çıkarımı yerelde
+çalışır; model indirildikten sonra yerel kullanım için harici yapay zekâ API'si
+gerekmez. İnternet paylaşımı açılırsa yüklemeler ve sonuçlar Cloudflare üzerinden
+uygulamanın çalıştığı bilgisayara taşınır. Bu modda yalnızca paylaşılması onaylanan
+belgeler kullanılmalıdır. Bu bağımsız bir prototiptir; resmî kurum hizmeti değildir.
 
-## Şifreli paylaşım
+## Güncel arayüz ve paylaşım
 
-`.venv/bin/python demo_start.py --archive` komutu ana uygulamayı 8503
-portunda şifreli olarak başlatır. İlk başlatmada oluşturulan şifre
-`.demo/password.txt` dosyasındadır; Git'e yüklenmez. Giriş yapan kişiler
-mevcut kayıtları görür ve yeni belgeleri ortak arşive kaydedebilir.
-Yerel klasör yolu bu modda kapalıdır. Harici erişim için ayrıca güvenli
-bir tünel gerekir. Bu geçici paylaşım modu kurumsal rol yönetimi sağlamaz.
+Sol menülü arayüzde belge işleme ve kayıtlı belgeler ekranları bulunur.
+`demo_start.py --archive` şifreli ortak arşivi, `share_start.py` ise buna ek
+olarak sabit Cloudflare tünelini başlatır. Sabit adres:
+`https://arsiv.mahmutkoc.me`. Bilgisayar ve başlatıcı açık kalmalıdır.
+Bu adres bir bulut sunucusunda sürekli barındırma anlamına gelmez.
 
-`--archive` olmadan başlatılan demo mevcut arşivi göstermez ve sonuçları
-yalnızca oturumda tutar. Her iki modda da model çıktıları insan kontrolü
-gerektirir. Belge, veritabanı, model ve şifre dosyaları bu depoya dahil değildir.
+Şifre ve tünel anahtarları `.demo/` altında yerel tutulur; GitHub'a yüklenmez.
+Ortak şifreyle giriş yapanlar aynı arşiv kayıtlarını görebilir. Kurumsal
+kullanımdan önce erişim yetkileri, denetim kayıtları ve veri politikaları ayrıca
+değerlendirilmelidir. Yedek kapsamı için [YEDEKLEME.md](YEDEKLEME.md).
 
-Bu depo yalnızca kaynak kodu içerir. Arşiv belgeleri, veritabanı, çıkarılan
-metinler ve model dosyaları paylaşılmaz. Kurulum sırasında bağımlılıkları
-ve modeli indirmek için internet gerekir; kurulumdan sonra belge işleme
-yerelde çalışır. Gerçek belgelerle çalışan ölçüm betikleri için örnek
-belgeleri kendi bilgisayarınızda `data/` altına koymanız gerekir.
+İlk başlatmada oluşturulan parola `.demo/password.txt` dosyasındadır.
+Yerel klasör yolu paylaşım modunda kapalıdır. `--archive` olmadan başlatılan
+izole demo mevcut arşivi göstermez, sonuçları yalnızca oturumda tutar.
+Her iki modda da model çıktıları insan kontrolü gerektirir.
+Bu depo yalnızca kaynak kodunu içerir; gerçek belgeler, veritabanı, çıkarılan
+metinler ve model dahil değildir. Ölçüm betiklerinin ihtiyaç duyduğu örnek
+belgeler yerelde `data/` altına ayrıca konulmalıdır.
 
 ## Ne yapar
 

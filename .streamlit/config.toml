@@ -7,3 +7,11 @@ port = 8502
 # Streamlit'in kullanım istatistikleri belge içeriği taşımaz ama
 # uygulamanın tamamen çevrimdışı olduğu iddiasını bozar.
 gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#ac202d"
+backgroundColor = "#f3f4f6"
+secondaryBackgroundColor = "#ffffff"
+textColor = "#292a32"
+font = "sans serif"

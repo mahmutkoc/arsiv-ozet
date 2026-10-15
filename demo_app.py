@@ -49,15 +49,15 @@ def main():
     if sample:
         st.text(SAMPLE)
     uploaded = st.file_uploader(
-        "Sayfaları okuma sırasıyla seçin: en fazla 15 sayfa, toplam 20 MB",
+        "Sayfaları okuma sırasıyla seçin: en fazla 100 sayfa, toplam 200 MB",
         type=["jpg", "jpeg", "png", "tif", "tiff", "pdf"],
         accept_multiple_files=True, disabled=busy or sample,
     )
     if st.button("Oku ve künye çıkar", type="primary", disabled=busy):
         if not sample and not uploaded:
             st.warning("Dosya seçin veya kurgusal örneği işaretleyin.")
-        elif not sample and (len(uploaded) > 15 or sum(f.size for f in uploaded) > 20 * 1024 * 1024):
-            st.error("En fazla 15 dosya ve toplam 20 MB yükleyebilirsiniz.")
+        elif not sample and (len(uploaded) > 100 or sum(f.size for f in uploaded) > 200 * 1024 * 1024):
+            st.error("En fazla 100 dosya ve toplam 200 MB yükleyebilirsiniz.")
         else:
             try:
                 files = [] if sample else [(f.name, f.getvalue()) for f in uploaded]

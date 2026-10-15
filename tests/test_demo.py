@@ -14,8 +14,7 @@ from core.summarize import extract_kunye
 
 class DemoTests(unittest.TestCase):
     def test_upload_limits(self):
-        for files in ([], [("a.jpg", b"x")] * 16,
-                      [("a.jpg", b"x" * (20 * 1024 * 1024 + 1))],
+        for files in ([], [("a.jpg", b"x")] * 101,
                       [("a.pdf", b"x"), ("b.jpg", b"x")], [("a.py", b"x")]):
             with self.assertRaises(ValueError):
                 validate_files(files)
@@ -24,6 +23,38 @@ class DemoTests(unittest.TestCase):
         buffer = io.BytesIO()
         Image.new("RGB", (50, 50), "white").save(buffer, format="PNG")
         validate_files([("../../example.png", buffer.getvalue())])
+
+    def test_100_images(self):
+        buffer = io.BytesIO()
+        Image.new("RGB", (10, 10), "white").save(buffer, format="PNG")
+        validate_files([(f"{i}.png", buffer.getvalue()) for i in range(100)])
+
+    def test_pdf_page_boundary(self):
+        for count in (100, 101):
+            document = Mock()
+            document.__len__ = Mock(return_value=count)
+            document.get_page_size.return_value = (595, 842)
+            with patch('core.demo.pypdfium2.PdfDocument') as pdf:
+                pdf.return_value.__enter__.return_value = document
+                if count == 100:
+                    validate_files([('a.pdf', b'pdf')])
+                else:
+                    with self.assertRaisesRegex(ValueError, '100'):
+                        validate_files([('a.pdf', b'pdf')])
+
+    def test_total_byte_boundary(self):
+        class Sized:
+            def __init__(self, size): self.size = size
+            def __len__(self): return self.size
+        limit = 200 * 1024 * 1024
+        with patch('core.demo.pypdfium2.PdfDocument') as pdf:
+            pdf.return_value.__enter__.return_value.__len__.return_value = 1
+            pdf.return_value.__enter__.return_value.get_page_size.return_value = (595, 842)
+            validate_files([('a.pdf', Sized(limit))])
+            with self.assertRaisesRegex(ValueError, '200'):
+                validate_files([('a.pdf', Sized(limit + 1))])
+            with self.assertRaisesRegex(ValueError, '200'):
+                validate_files([('a.png', Sized(limit // 2 + 1)), ('b.png', Sized(limit // 2))])
 
     def test_corrupt_image(self):
         with self.assertRaises(Exception):

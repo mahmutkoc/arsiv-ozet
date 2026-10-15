@@ -17,8 +17,8 @@ from core.summarize import LocalModel, extract_kunye
 
 ROOT = Path(__file__).resolve().parent.parent
 PASSWORD_FILE = ROOT / ".demo/password.txt"
-MAX_BYTES = 20 * 1024 * 1024
-MAX_PAGES = 15
+MAX_BYTES = 200 * 1024 * 1024
+MAX_PAGES = 100
 MAX_PIXELS = 20_000_000
 SAMPLE = (
     "Kurgusal deneme belgesidir. 12 Mart 1937. Geyve Belediye Başkanlığına. "
@@ -78,9 +78,9 @@ class DemoQueue:
 
 def validate_files(files):
     if not files or len(files) > MAX_PAGES:
-        raise ValueError("1–15 görüntü veya en fazla 15 sayfalık tek PDF yükleyin.")
+        raise ValueError("1–100 görüntü veya en fazla 100 sayfalık tek PDF yükleyin.")
     if sum(len(data) for _, data in files) > MAX_BYTES:
-        raise ValueError("Toplam dosya boyutu 20 MB'ı aşamaz.")
+        raise ValueError("Toplam dosya boyutu 200 MB'ı aşamaz.")
     pdfs = [name for name, _ in files if Path(name).suffix.lower() == ".pdf"]
     if pdfs and len(files) != 1:
         raise ValueError("PDF'i tek başına yükleyin; görüntülerle birlikte yüklemeyin.")
@@ -89,7 +89,7 @@ def validate_files(files):
         if suffix == ".pdf":
             with pypdfium2.PdfDocument(data) as document:
                 if not 1 <= len(document) <= MAX_PAGES:
-                    raise ValueError("PDF en fazla 15 sayfa olabilir.")
+                    raise ValueError("PDF en fazla 100 sayfa olabilir.")
                 for index in range(len(document)):
                     width, height = document.get_page_size(index)
                     if width <= 0 or height <= 0 or width * height * 9 > MAX_PIXELS:

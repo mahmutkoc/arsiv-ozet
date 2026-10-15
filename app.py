@@ -10,6 +10,7 @@ import shutil
 import os
 import threading
 import tempfile
+import secrets
 from pathlib import Path
 
 import streamlit as st
@@ -28,6 +29,36 @@ SHARED = os.environ.get("ARSIV_SHARED") == "1"
 def shared_resources():
     from core.demo import DemoQueue
     return DemoQueue(), threading.Lock()
+
+
+@st.cache_resource
+def job_manager():
+    from core.jobs import JobManager
+    return JobManager()
+
+
+@st.fragment(run_every='2s')
+def job_status(owner):
+    manager = job_manager()
+    job, busy = manager.snapshot(owner)
+    if job:
+        if job['status'] in ('running', 'cancelling', 'saving'):
+            st.progress(job['fraction'], text=job['message'])
+            if st.button('İşlemi iptal et', disabled=job['status'] != 'running'):
+                manager.cancel_job(owner)
+                st.rerun()
+        elif job['status'] == 'done':
+            st.success(job['message'])
+            result = job['result']
+            if result is not None:
+                render_kunye(result.kunye)
+                render_pages([(p.number, p.text) for p in result.pages])
+        elif job['status'] == 'cancelled':
+            st.info(job['message'])
+        else:
+            st.error(job['message'])
+    if busy and (not job or job['status'] not in ('running', 'cancelling')):
+        st.info('Başka bir belge işleniyor; tamamlanınca yeni işlem başlatabilirsiniz.')
 
 
 def require_login():
@@ -110,12 +141,19 @@ def render_pages(pages: list[tuple[int, str]]) -> None:
 def page_process() -> None:
     st.header("Belgelerden katalog künyesine.")
     st.caption("Gömlekteki sayfaları yükleyin, künye taslağını hazırlayın ve kontrol edin.")
+    # Tahmin edilemez takip anahtarı yenilemede URL'de kalır; giriş kontrolü önce yapılır.
+    owner = st.query_params.get('islem', '')
+    if len(owner) != 64 or any(c not in '0123456789abcdef' for c in owner):
+        owner = secrets.token_hex(32)
+        st.query_params['islem'] = owner
+    st.caption('Bu sayfayı yenileseniz de işlem sürer. İptal için aşağıdaki düğmeyi kullanın. İşlem takip bağlantısını paylaşmayın.')
     input_column, result_column = st.columns([1, 1], gap="large")
     input_card = input_column.container(border=True)
     result_card = result_column.container(border=True)
     with result_card:
-        preview = st.empty()
-        preview.info("Katalog künyesi burada görünecek. Başlamak için belgelerinizi yükleyin.")
+        job_status(owner)
+        if job_manager().snapshot(owner)[0] is None:
+            st.info("Katalog künyesi burada görünecek. Başlamak için belgelerinizi yükleyin.")
     with input_card:
         st.subheader("01 · Belgeleri yükleyin")
 
@@ -123,9 +161,10 @@ def page_process() -> None:
         "Sayfa görüntülerini ya da PDF'i yükle",
         type=["jpg", "jpeg", "png", "tif", "tiff", "pdf"],
         accept_multiple_files=True,
-        help="Katalogdan indirdiğin sayfaları sırayla seç. Tek bir PDF de olabilir.",
+        help="Sayfaları sırayla seç: en fazla 100 sayfa ve toplam 200 MB. Tek PDF veya görüntüler.",
     )
 
+    input_card.caption("En fazla 100 sayfa · Toplam 200 MB. İnternet tünelinde tek yükleme isteği 100 MB ile sınırlıdır; büyük PDF için bu Mac'te http://127.0.0.1:8503 kullanın.")
     folder_input = "" if SHARED else input_card.text_input(
         "…ya da bir klasör yolu ver",
         placeholder="/Users/mahmut/arsiv-ozet/data/ornek",
@@ -146,7 +185,7 @@ def page_process() -> None:
             try:
                 validate_files([(item.name, item.getvalue()) for item in uploaded])
             except Exception:
-                st.error("En fazla 15 sayfa ve toplam 20 MB: tek PDF veya geçerli görüntüler yükleyin.")
+                st.error("En fazla 100 sayfa ve toplam 200 MB: tek PDF veya geçerli görüntüler yükleyin. Sayfa boyutu ve dosya biçimi sınırları da geçerlidir.")
                 return
         temp_dir = Path(tempfile.mkdtemp(prefix="arsiv-"))
         for index, item in enumerate(uploaded, start=1):
@@ -163,63 +202,19 @@ def page_process() -> None:
         st.warning("Dosya yükle ya da klasör yolu gir.")
         return
 
-    progress = st.progress(0.0, text="Başlıyor…")
-
-    def report(message: str, fraction: float) -> None:
-        progress.progress(fraction, text=message)
-
-    lock = shared_resources()[1] if SHARED else None
-    if lock is not None and not lock.acquire(blocking=False):
-        if temp_dir:
-            shutil.rmtree(temp_dir, ignore_errors=True)
-        progress.empty()
-        st.warning("Başka bir belge işleniyor; işlem bitince tekrar deneyin.")
-        return
     try:
-        # Okuma önce yapılıyor: model 7 GB tuttuğu için OCR sırasında
-        # bellekte olması görüntü okumayı başarısız kılabiliyor.
-        pages = read_pages(source, on_progress=report)
-
-        with st.spinner("Model hazırlanıyor…"):
-            model = get_model()
-
-        result = extract(source, pages, model=model, on_progress=report)
-    except Exception as error:  # noqa: BLE001 - kullanıcıya sebebi göstermek istiyoruz
-        progress.empty()
-        st.error("Belge işlenemedi. Dosyayı kontrol edin veya uygulama sahibine bildirin."
-                 if SHARED else f"İşlem başarısız: {error}")
-        return
-    finally:
-        if lock is not None:
-            lock.release()
+        accepted = job_manager().submit(owner, source, temp_dir, name)
+    except Exception:
         if temp_dir:
             shutil.rmtree(temp_dir, ignore_errors=True)
-
-    progress.empty()
-
-    with store.session() as db:
-        store.save(
-            db,
-            ad=name.strip() or result.name,
-            kaynak=result.source,
-            page_texts=[(p.number, p.source, p.text) for p in result.pages],
-            ozet=result.kunye.ozet,
-            adlar={
-                "yer": result.kunye.yer_adlari,
-                "sahis": result.kunye.sahis_adlari,
-                "kurum": result.kunye.kurum_adlari,
-            },
-        )
-
-    st.success(f"{result.page_count} sayfa, {result.word_count} kelime okundu.")
-    preview.empty()
-    with result_card:
-        render_kunye(result.kunye)
-    if result.kunye.notes:
-        with st.expander("Sayfa sayfa döküm"):
-            for note in result.kunye.notes:
-                st.text(note)
-    render_pages([(p.number, p.text) for p in result.pages])
+        st.error('İşlem başlatılamadı.')
+        return
+    if not accepted:
+        if temp_dir:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        st.warning('Başka bir belge işleniyor. Kendi işleminizi iptal ettiyseniz iptalin tamamlanmasını bekleyin.')
+        return
+    st.rerun()
 
 
 def page_archive() -> None:

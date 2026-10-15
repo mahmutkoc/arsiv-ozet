@@ -55,6 +55,8 @@ class Page:
 
 def _run_tesseract(image: np.ndarray, *, lang: str, psm: int) -> str:
     """Hazırlanmış görüntüyü Tesseract'a verip metni alır."""
+    from core.cancellation import checkpoint
+    checkpoint()
     binary = find_tesseract()
     encoded = cv2.imencode(".png", image)[1].tobytes()
 
@@ -63,6 +65,7 @@ def _run_tesseract(image: np.ndarray, *, lang: str, psm: int) -> str:
         input=encoded,
         capture_output=True,
     )
+    checkpoint()
     if result.returncode != 0:
         raise RuntimeError(f"Tesseract hatası: {result.stderr.decode(errors='replace')}")
     return result.stdout.decode("utf-8", errors="replace")

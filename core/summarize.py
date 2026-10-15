@@ -23,6 +23,8 @@ import json
 import os
 import re
 import signal
+import shutil
+import platform
 import subprocess
 import threading
 import time
@@ -36,7 +38,11 @@ from openai import OpenAI
 from core.text import fold, turkish_lower, turkish_upper
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-LLAMA_SERVER = PROJECT_ROOT / ".mamba/bin/llama-server"
+LLAMA_SERVER = Path(os.environ.get("ARSIV_LLAMA_SERVER") or (
+    str(PROJECT_ROOT / ".mamba/bin/llama-server")
+    if (PROJECT_ROOT / ".mamba/bin/llama-server").is_file()
+    else shutil.which("llama-server") or str(Path.home() / "llama.cpp/build/bin/llama-server")
+))
 MODEL_DIR = PROJECT_ROOT / "modeller"
 
 # Sabit port. Rastgele port her çalıştırmada yeni sunucu doğurup belleği
@@ -157,6 +163,12 @@ BELGE:
 
 def find_model() -> Path:
     """modeller/ altındaki GGUF dosyasını bulur."""
+    configured = os.environ.get("ARSIV_MODEL_PATH")
+    if configured:
+        model = Path(configured).expanduser()
+        if not model.is_file():
+            raise RuntimeError(f"Model dosyası bulunamadı: {model}")
+        return model
     candidates = sorted(MODEL_DIR.rglob("*.gguf"))
     if not candidates:
         raise RuntimeError(
@@ -202,8 +214,9 @@ class LocalModel:
                 str(LLAMA_SERVER),
                 "-m", str(self.model_path),
                 "--port", str(self.port),
+                "--host", "127.0.0.1",
                 "-c", str(self.context),
-                "-ngl", "99",          # Tüm katmanlar Metal GPU'ya.
+                "-ngl", os.environ.get("ARSIV_GPU_LAYERS", "99" if platform.system() == "Darwin" else "0"),
                 "--no-warmup",
             ],
             stdout=subprocess.DEVNULL,
@@ -261,6 +274,8 @@ class LocalModel:
         raise TimeoutError(f"llama-server {timeout:.0f} saniyede hazır olmadı.")
 
     def ask(self, instruction: str, text: str, *, max_tokens: int = 1024) -> str:
+        from core.cancellation import checkpoint
+        checkpoint()
         response = self.client.chat.completions.create(
             model="yerel",
             messages=[
@@ -270,6 +285,7 @@ class LocalModel:
             temperature=0.2,
             max_tokens=max_tokens,
         )
+        checkpoint()
         return (response.choices[0].message.content or "").strip()
 
 
